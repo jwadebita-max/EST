@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Console Admin - {{ config.site_name if config else 'EST Social' }}</title>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <nav class="bg-white border-b border-slate-200 p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </div>
+                <h1 class="text-xl font-black italic tracking-tighter text-slate-800 uppercase">Panel <span class="text-indigo-600">Control</span></h1>
+            </div>
+            <a href="/" class="text-xs font-bold bg-slate-100 px-4 py-2 rounded-lg hover:bg-slate-200 transition-all text-slate-600">
+                <i class="fa-solid fa-arrow-left mr-2"></i>RETOUR AU FEED
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-1 space-y-6">
+            <section class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <h2 class="text-xs font-black uppercase tracking-widest text-indigo-500 mb-6 italic">Configuration Site</h2>
+                <form action="/update_site" method="POST" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Nom de l'application</label>
+                        <input type="text" name="site_name" value="{{ config.site_name if config else 'EST SOCIAL' }}"
+                               class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none font-bold text-slate-700 transition-all">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-indigo-600 transition-all">
+                        Mettre à jour
+                    </button>
+                </form>
+            </section>
+
+            <div class="bg-indigo-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-indigo-100">
+                <p class="text-[10px] font-black uppercase opacity-60 tracking-[0.2em] mb-1">Total Publications</p>
+                <h3 class="text-5xl font-black italic tracking-tighter">{{ posts|length }}</h3>
+                <div class="mt-6 pt-6 border-t border-white/10 flex justify-between items-center text-[10px] font-bold uppercase">
+                    <span>Activité : Haute</span>
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2">
+            <section class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-8 border-b border-slate-50 flex justify-between items-center">
+                    <h2 class="text-xs font-black uppercase tracking-widest text-slate-800 italic">Modération des Flux</h2>
+                    <span class="bg-emerald-100 text-emerald-600 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Live</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <tr>
+                                <th class="p-6">Aperçu</th>
+                                <th class="p-6">Titre / Type</th>
+                                <th class="p-6">Date</th>
+                                <th class="p-6 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for post in posts %}
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="p-6">
+                                    <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden border border-slate-200">
+                                        {% if post.title.startswith('TYPE_VIDEO:') %}
+                                            <div class="w-full h-full flex items-center justify-center bg-slate-800 text-white"><i class="fa-solid fa-play text-xs"></i></div>
+                                        {% else %}
+                                            <img src="/static/uploads/{{ post.media_file }}" class="w-full h-full object-cover">
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="p-6">
+                                    <h4 class="font-bold text-sm text-slate-700 leading-none mb-1">{{ post.title.replace('TYPE_VIDEO:', '') }}</h4>
+                                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-tighter">
+                                        {{ 'VIDEO_MP4' if post.title.startswith('TYPE_VIDEO:') else 'IMAGE_POST' }}
+                                    </p>
+                                </td>
+                                <td class="p-6 text-[10px] font-bold text-slate-400">
+                                    {{ post.date_posted.strftime('%d %b, %H:%M') }}
+                                </td>
+                                <td class="p-6 text-right">
+                                    <div class="flex justify-end space-x-2">
+                                        <form action="/delete_post/{{ post.id }}" method="POST" onsubmit="return confirm('Supprimer définitivement ?')">
+                                            <button class="w-9 h-9 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                                <i class="fa-solid fa-trash-can text-xs"></i>
+                                            </button>
+                                        </form>
+                                        <button class="w-9 h-9 bg-slate-50 text-slate-400 rounded-xl hover:bg-yellow-400 hover:text-white transition-all">
+                                            <i class="fa-solid fa-star text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not posts %}
+                <div class="p-20 text-center text-slate-300">
+                    <i class="fa-solid fa-folder-open text-4xl mb-4 opacity-20"></i>
+                    <p class="text-xs font-bold uppercase tracking-widest">Aucune publication pour le moment</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-6 py-10 opacity-30">
+        <div class="border-t border-slate-200 pt-6 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.3em]">
+            <span>System Status: Online</span>
+            <span>Admin ID: 001 - EST Salé</span>
+        </div>
+    </footer>
+
+</body>
+</html>
