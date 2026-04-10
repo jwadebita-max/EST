@@ -1,7 +1,7 @@
 
 ---
 
-## **GitHub Repository Description (English):**
+## **GitHub Repository Description :**
 
 ### **EST Social - Gamified Social Learning Platform**
 
