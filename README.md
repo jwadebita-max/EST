@@ -167,7 +167,6 @@ pip install -r requirements.txt
 python app.py
 ```
 
-**Admin par défaut :** `admin` / `admin123`
 
 ---
 
